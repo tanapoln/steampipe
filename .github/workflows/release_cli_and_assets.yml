@@ -45,7 +45,7 @@ jobs:
 
   build_and_release_assets:
     name: Build and Release Assets
-    needs: [verify_input,verify_asset_unreleased]
+    needs: [ verify_input ]
     if: needs.verify_asset_unreleased.outputs.status == 'success'
     runs-on: ubuntu-latest
     steps:
