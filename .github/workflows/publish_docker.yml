@@ -22,15 +22,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # TODO: v0.21.x will be the last version we publish our images to Docker Hub. Update Docker
-      # publish workflow to stop publishing to Docker Hub just before v0.22.0 comes out.
-      # https://github.com/turbot/steampipe/issues/3327
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -48,52 +39,12 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           build-args: |
             TARGETVERSION=${{ env.STEAMPIPE_VERSION }}
           tags: |
-            turbot/steampipe:${{ steps.generate_docker_tag.outputs.docker_tag }}
-            turbot/steampipe:latest
-            ghcr.io/turbot/steampipe:${{ steps.generate_docker_tag.outputs.docker_tag }}
-            ghcr.io/turbot/steampipe:latest
+            ghcr.io/tanapoln/steampipe:${{ steps.generate_docker_tag.outputs.docker_tag }}
+            ghcr.io/tanapoln/steampipe:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-
-  update_homebrew_tap:
-    name: Update homebrew-tap formula
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: turbot/homebrew-tap
-          token: ${{ secrets.GH_ACCESS_TOKEN }}
-          ref: main
-
-      - name: Get pull request title
-        id: pr_title
-        run: >-
-          echo "PR_TITLE=$(
-            gh pr view $STEAMPIPE_VERSION --json title | jq .title | tr -d '"'
-          )" >> $GITHUB_OUTPUT
-
-      - name: Output
-        run: |
-          echo ${{ steps.pr_title.outputs.PR_TITLE }}
-          echo ${{ env.STEAMPIPE_VERSION }}
-
-      - name: Fail if PR title does not match with version
-        run: |
-          if ${{ (steps.pr_title.outputs.PR_TITLE == env.STEAMPIPE_VERSION) }} == 'true';then
-            echo "Correct version"
-          else
-            echo "Incorrect version"
-            exit 1
-          fi
-
-      - name: Merge pull request to update brew formula
-        run: |
-          git fetch --all
-          gh pr merge $STEAMPIPE_VERSION --squash --delete-branch
-          git push origin --delete bump-brew
