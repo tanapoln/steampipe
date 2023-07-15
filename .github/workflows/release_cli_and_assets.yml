@@ -201,7 +201,7 @@ jobs:
 
   build_and_release_cli:
     name: Release CLI
-    needs: [create_release_tag, ensure_branch_in_homebrew]
+    needs: [ create_release_tag ]
     runs-on: ubuntu-latest
     steps:
     - name: Trim asset version prefix and Validate
@@ -245,7 +245,7 @@ jobs:
     # refer:
     #   https://docs.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts#downloading-and-deleting-artifacts-after-a-workflow-run-is-complete
     name: Clean Up Artifacts
-    needs: update_pr_for_versioning
+    needs: [ ]
     runs-on: ubuntu-latest
     steps:
     - name: Clean up Linux Build
