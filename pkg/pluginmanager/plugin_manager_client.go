@@ -3,6 +3,7 @@ package pluginmanager
 import (
 	"io"
 	"log"
+	"math"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
@@ -10,6 +11,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/logging"
 	pb "github.com/turbot/steampipe/pkg/pluginmanager_service/grpc/proto"
 	pluginshared "github.com/turbot/steampipe/pkg/pluginmanager_service/grpc/shared"
+	gogrpc "google.golang.org/grpc"
 )
 
 // PluginManagerClient is the client used by steampipe to access the plugin manager
@@ -44,6 +46,9 @@ func (c *PluginManagerClient) attachToPluginManager() error {
 		AllowedProtocols: []plugin.Protocol{
 			plugin.ProtocolNetRPC, plugin.ProtocolGRPC},
 		Logger: logger,
+		GRPCDialOptions: []gogrpc.DialOption{
+			gogrpc.WithTimeout(math.MaxInt64),
+		},
 	})
 
 	// connect via RPC

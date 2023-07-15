@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"google.golang.org/grpc"
 	"log"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -554,6 +556,9 @@ func (m *PluginManager) startPluginProcess(pluginName string, connectionConfigs 
 		},
 		// pass our logger to the plugin client to ensure plugin logs end up in logfile
 		Logger: m.logger,
+		GRPCDialOptions: []grpc.DialOption{
+			grpc.WithTimeout(math.MaxInt64),
+		},
 	})
 
 	if _, err := client.Start(); err != nil {
