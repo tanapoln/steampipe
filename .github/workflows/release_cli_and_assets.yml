@@ -48,7 +48,7 @@ jobs:
     needs: [ verify_input ]
     runs-on: ubuntu-latest
     steps:
-    - name: Trim asset version prefix and Validate
+      - name: Trim asset version prefix and Validate
       run: |-
         echo $VERSION
         trim=${VERSION#"v"}
@@ -61,15 +61,22 @@ jobs:
         fi
         echo "VERSION=${trim}" >> $GITHUB_ENV
 
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.ref }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_ACCESS_TOKEN }}
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
     - name: Setup Yarn
       working-directory: ./ui/dashboard
