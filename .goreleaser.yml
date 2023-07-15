@@ -8,10 +8,8 @@ builds:
       - GO111MODULE=on
     goos:
       - linux
-      - darwin
     goarch:
       - amd64
-      - arm64
 
     id: "steampipe"
     binary:
@@ -25,20 +23,6 @@ archives:
     format_overrides:
     - goos: linux
       format: tar.gz
-
-nfpms:
-  - id: "steampipe"
-    builds: ['steampipe']
-    formats:
-      - deb
-      - rpm
-    vendor: "steampipe.io"
-    homepage: "https://steampipe.io/"
-    maintainer: "Turbot Support <help@turbot.com>"
-    description: "Use SQL to instantly query your cloud services (AWS, Azure, GCP and more). Open source CLI. No DB required."
-    file_name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    rpm:
-      summary: "Use SQL to instantly query your cloud services (AWS, Azure, GCP and more). Open source CLI. No DB required."
 
 # it is necessary to specify the name_template of the snapshot, or else the snapshot gets created with
 # two dash(-) which results in a 500 error while downloading
@@ -59,20 +43,3 @@ release:
   draft: true
 changelog:
   skip: true
-
-brews:
-  -
-    ids:
-      - homebrew
-    name: steampipe@{{ .Major }}.{{ .Minor }}.{{ .Patch }}
-    tap:
-      owner: turbot
-      name: homebrew-tap
-      branch: bump-brew
-    folder: Formula
-    url_template: "https://github.com/turbot/steampipe/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    homepage: "https://steampipe.io/"
-    description: "Steampipe exposes APIs and services as a high-performance relational database, giving you the ability to write SQL-based queries to explore, assess and report on dynamic data."
-    skip_upload: auto
-    install: |-
-      bin.install "steampipe"
