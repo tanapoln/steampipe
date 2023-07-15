@@ -1,6 +1,7 @@
 name: Steampipe Acceptance Tests
 on:
   pull_request:
+  workflow_dispatch:
 
 env:
   STEAMPIPE_UPDATE_CHECK: false
